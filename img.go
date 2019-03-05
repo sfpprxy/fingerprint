@@ -18,11 +18,7 @@ func Process(srcPath string, newPath string, black float64, white float64) {
 	if err != nil {
 		log.Fatalf("failed to open image: %v", err)
 	}
-	src = optimize(src, black, white)
-	err = imaging.Save(src, newPath)
-	if err != nil {
-		log.Fatalf("failed to save image: %v", err)
-	}
+	optimize(src, newPath, black, white)
 	vectorize(newPath)
 }
 
@@ -55,7 +51,7 @@ func vectorize(fileName string) {
 	log.Println(string(stdout))
 }
 
-func optimize(img image.Image, black float64, white float64) image.Image {
+func optimize(img image.Image, fileName string, black float64, white float64) {
 	img = imaging.Grayscale(img)
 
 	// Resize the cropped image to width = 200px preserving the aspect ratio.
@@ -68,5 +64,8 @@ func optimize(img image.Image, black float64, white float64) image.Image {
 	img = levels.SetWhite(img, channel.Green, white)
 	img = levels.SetWhite(img, channel.Blue, white)
 
-	return img
+	err := imaging.Save(img, fileName)
+	if err != nil {
+		log.Fatalf("failed to save image: %v", err)
+	}
 }
