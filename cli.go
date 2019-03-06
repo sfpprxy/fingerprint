@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 	"path/filepath"
-)
+	)
 
 /*
 	命令行版本：
@@ -24,7 +24,10 @@ import (
 	2. 密码错误无提示直接退出程序
 	3. 继续保持对OS X和Windows的兼容性
 */
-func HandleInput(args []string)  {
+func HandleCliInput(args []string)  {
+	if len(args) == 0 {
+		return
+	}
 	var path, token, b, w string
 	if len(args) != 4 {
 		log.Fatalln("err code: 1 - invalid arg number") // log.Fatalln will exit program
@@ -63,7 +66,7 @@ func HandleInput(args []string)  {
 	// pass exam and start process
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
-		log.Println("directory")
+		// dir
 		fileNames := make([]string, 0)
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
 			if IsSupported(filePath) {
@@ -78,7 +81,7 @@ func HandleInput(args []string)  {
 			Process(f, ToBmp(f), float64(ib), float64(iw))
 		}
 	case mode.IsRegular():
-		log.Println("file")
+		// file
 		Process(path, ToBmp(path), float64(ib), float64(iw))
 	}
 

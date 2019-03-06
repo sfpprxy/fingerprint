@@ -10,8 +10,7 @@ import (
 
 func main() {
 
-	args := os.Args[1:]
-	HandleInput(args)
+	HandleCliInput(os.Args[1:])
 
 	err := ui.Main(func() {
 		window := ui.NewWindow("指纹图片一键处理V1.17", 500, 500, true)

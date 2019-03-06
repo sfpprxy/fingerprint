@@ -10,8 +10,28 @@ import (
 	"strings"
 	"path/filepath"
 	"os"
-	"io/ioutil"
+	"runtime"
 )
+
+var potracePath = findPotrace()
+
+func findPotrace() string {
+	pwd, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	platform := runtime.GOOS
+	name := ""
+	switch platform {
+	case "windows":
+		name = "potrace-1.15.win32"
+	case "darwin":
+		name = "potrace-1.15.mac-x86_64"
+		log.Println()
+	}
+	potracePath := filepath.Join(pwd, name, "potrace")
+	return potracePath
+}
 
 func Process(srcPath string, newPath string, black float64, white float64) {
 	src, err := imaging.Open(srcPath)
@@ -23,24 +43,6 @@ func Process(srcPath string, newPath string, black float64, white float64) {
 }
 
 func vectorize(fileName string) {
-	pwd, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	log.Println(pwd)
-	files, err := ioutil.ReadDir(pwd)
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	name := ""
-	// TODO: 这里通过文件夹名定位potrace程序, 目前是写死的, 应修改代码, 判断当前是哪种操作系统来自行选择win还是mac的potrace
-	for _, v := range files {
-		if strings.Contains(v.Name(), "potrace") {
-			name = v.Name()
-			log.Println(name)
-		}
-	}
-	potracePath := filepath.Join(pwd, name, "potrace")
 	cmd := exec.Command(potracePath, "-b", "dxf",
 		fileName, "-o",
 		strings.Replace(fileName, ".bmp", ".dxf", -1))
