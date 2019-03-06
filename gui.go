@@ -5,11 +5,13 @@ import (
 	_ "github.com/andlabs/ui/winmanifest"
 	"path/filepath"
 	"os"
-	"strings"
 	"log"
 )
 
 func main() {
+
+	args := os.Args[1:]
+	HandleInput(args)
 
 	err := ui.Main(func() {
 		window := ui.NewWindow("指纹图片一键处理V1.17", 500, 500, true)
@@ -110,8 +112,7 @@ func main() {
 					progress = float64(i+1.0) / float64(len(fileNames))
 					p := int(progress * 100)
 					progressBar.SetValue(p)
-					ext := filepath.Ext(filePath)
-					newPath := filePath[0:len(filePath)-len(ext)] + ".bmp"
+					newPath := ToBmp(filePath)
 					log.Println(newPath)
 					Process(filePath, newPath, float64(spinboxB.Value())/100, float64(spinboxW.Value())/100)
 				}
@@ -133,13 +134,8 @@ func main() {
 		window.Show()
 	})
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
-}
-
-func isSupported(path string) bool {
-	ext := filepath.Ext(strings.ToLower(path))
-	return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".bmp"
 }
 
 func showFiles(fileName string, fileList *ui.Entry, checkbox *ui.Checkbox) []string {
@@ -147,20 +143,20 @@ func showFiles(fileName string, fileList *ui.Entry, checkbox *ui.Checkbox) []str
 	if fileName == "" {
 		fileList.SetText("文件未选择")
 		fileNames[0] = fileName
-	} else if !isSupported(fileName) {
+	} else if !IsSupported(fileName) {
 		fileList.SetText("文件格式不支持")
 		fileNames[0] = fileName
 	} else {
 		if checkbox.Checked() {
 			fileNames = make([]string, 0)
 			err := filepath.Walk(filepath.Dir(fileName), func(path string, info os.FileInfo, err error) error {
-				if isSupported(path) {
+				if IsSupported(path) {
 					fileNames = append(fileNames, path)
 				}
 				return nil
 			})
 			if err != nil {
-				panic(err)
+				log.Fatalln(err)
 			}
 		} else {
 			fileNames[0] = fileName
