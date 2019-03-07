@@ -36,7 +36,7 @@ func HandleCliInput(args []string)  {
 	// exam token
 	token = args[3]
 	if token != "foobar" {
-		log.Fatalln("wrong token") // no return and exit
+		//log.Fatalln("wrong token") // no return and exit
 	}
 	// exam path
 	path = args[0]
@@ -47,7 +47,7 @@ func HandleCliInput(args []string)  {
 	// exam B & W
 	b = args[1]
 	w = args[2]
-	err3 := "err code: 3 - black arg not valid"
+	err3 := "err code: 3 - color arg not valid"
 	ib, err := strconv.ParseInt(b, 0, 64)
 	if err != nil {
 		log.Fatalln(err3)
@@ -78,11 +78,12 @@ func HandleCliInput(args []string)  {
 			log.Fatalln(err)
 		}
 		for _, f := range fileNames {
-			Process(f, ToBmp(f), float64(ib), float64(iw))
+			Process(f, ToBmp(f), float64(ib)/100, float64(iw)/100)
 		}
 	case mode.IsRegular():
 		// file
-		Process(path, ToBmp(path), float64(ib), float64(iw))
+		Process(path, ToBmp(path), float64(ib)/100, float64(iw)/100)
 	}
 
+	os.Exit(0)
 }
